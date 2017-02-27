@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>oncontextmenu</title>
+	<style>
+		#content{
+			background-color: #eee;
+			width: 400px;
+			height: 80px;
+			border-radius: 5px;
+			line-height: 80px;
+			padding-left: 20px;
+			border: 1px solid #ccc;
+		}
+		#menu{
+			border: 1px solid #ccc;
+			border-radius: 3px;
+			width: 202px;
+			height: 102px;
+			background-color: #fff;
+			display: none;
+			box-sizing: border-box;
+			position: absolute;
+			top: 0;
+			left: 0;
+		}
+		#menu div{
+			height: 50px;
+			line-height: 50px;
+			padding-left: 20px;
+			cursor: pointer;
+		}
+		#menu div:hover{
+			background-color: #f8f8f8;
+		}
+	</style>
+</head>
+<body>
+	<!-- 容器 -->
+	<div id="content" oncontextmenu="menu(event)">right click to see the menu</div>
+	<!-- 右键菜单 -->
+	<div id="menu" oncontextmenu="nomenu(event)">
+		<div onclick="console.log('Menu Item 1');">Menu Item 1</div>
+		<div onclick="console.log('Menu Item 2');">Menu Item 2</div>
+	</div>
+	
+	<script>
+		// 新右键菜单
+		function menu(event) {
+			var e = event ? event : window.event;
+			// 鼠标位置
+			var pagex = e.pagex;
+			var pagey = e.pagey;
+			if (pagex === undefined) {
+				pagex = e.clientX + (document.body.scrollLeft || document.documentElement.scrollLeft);
+			}
+			if (pagey === undefined) {
+				pagey = e.clientY + (document.body.scrollTop || document.documentElement.scrollTop);
+			}
+			// 窗口大小
+			var winw = window.innerWidth;
+			var winh = window.innerHeight;
+			// 右键菜单大小
+			var menu = document.getElementById('menu');
+			var menuStyle = menu.currentStyle||document.defaultView.getComputedStyle(menu,null);
+			var menuw = parseInt(menuStyle.width);
+			var menuh = parseInt(menuStyle.height);
+			// 新菜单左上角坐标，如果上下左右都不够位置则显示在右下角
+			var menux = (winw - pagex < menuw) &&(pagex >= menuw) ? (pagex - menuw) : pagex;
+			var menuy = (winh - pagey < menuh) &&(pagey >= menuh) ? (pagey - menuh) : pagey;
+			// 阻止默认右键
+			if (e.preventDefault) {
+				e.preventDefault();
+			} else{
+				e.returnValue = false;
+			}
+			// 设置菜单样式
+			menu.style.display = 'block';
+			menu.style.top = menuy + 'px';
+			menu.style.left = menux + 'px';
+		}
+		// 新菜单上点击右键阻止默认事件
+		function nomenu(event) {
+			var e = event ? event : window.event;
+			if (e.preventDefault) {
+				e.preventDefault();
+			} else{
+				e.returnValue = false;
+			}
+		}
+		// 点击页面隐藏菜单
+		document.onclick = function (event) {
+			document.getElementById('menu').style.display = 'none';
+		}
+	</script>
+</body>
+</html>
